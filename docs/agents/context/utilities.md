@@ -19,28 +19,17 @@
 
 ## Core Utilities and Libs (`src/lib`)
 
-- **constants.ts** (`src/lib/constants.ts`): All gameplay tuning — arena size, snake speed/boost (max/drain/regen, `BOOST_MIN` start threshold, `BOOST_COOLDOWN`), turn rate, segment spacing, shell break threshold, shard physics params, HP, food spawn rules.
-- **types.ts** (`src/lib/types.ts`): Shared TypeScript types — `GamePhase`, `Vec3`, `InputState`, `FoodEntity`, `Shard`, `BreakInfo`, `BreakTracker`, `SnakeState` (incl. `boostCooldown`), `WorldState`.
-- **utils.ts** (`src/lib/utils.ts`): Vector/angle helpers — `clamp`, `distance3`, `shortestAngle`.
-- **world.ts** (`src/lib/world.ts`): Mutable game world — `createWorld()`, `resetWorld()`, `createInput()`, `spawnFood()`. The snake spawns at the arena center with `START_SEGMENTS` segments.
-- **physics.ts** (`src/lib/physics.ts`): Hand-rolled physics — `stepWorld()` (movement, steering with `MAX_TURN_RATE`, wall reflection + HP damage, ram detection, shard integration/pickup, food spawning), `isGameOver()`, `segmentRadius()`. Returns a `StepResult` (score gained / damage taken). Allocation-free hot paths (module-scoped scratch objects, in-place mutation); shared `reflectAxis` helper for wall/floor reflections; shards are tagged with a `breakId` and break bonuses are tracked per-break via `BreakTracker` (handles overlapping breaks). Boost runs on a cooldown: it drains fully to 0 while active, ends when the meter hits 0 (no stutter), starts a `BOOST_COOLDOWN` on end, and regenerates only after the cooldown expires. `BOOST_MIN` only gates starting a *new* boost — an active boost drains all the way down.
-- **hooks.ts** (`src/lib/hooks.ts`): React hooks — `useInputRef()` (shared mutable input), `useKeyboardInput()` (WASD/arrows + Space boost).
 - **styles.ts** (`src/lib/styles.ts`): `GlobalStyle` and `PageWrapper` (full-screen layout, dark background).
 - **index.css** (`src/index.css`): Global reset + `Exo 2` font import, imported in `src/main.tsx`. Also defines `.autoloop-hide-hud [data-hud] { display: none }` used by the autoloop harness.
 - **autoloop.ts** (`src/lib/autoloop.ts`): Test-mode runtime for the autoloop harness — `autoloopRuntime` (enabled/frozen/hudHidden/seed), `isAutoloopEnabled()` (`?autoloop=1`), `isAutoloopFrozen()`, `readAutoloopSeed()`, and the global `window.__autoloop` `AutoloopApi` type.
 - **random.ts** (`src/lib/random.ts`): Deterministic helpers for procedural generation — `seeded(index, seed)`, `hash2(x, y, seed)` (value-noise lattice hash), `createRng(seed)` (mulberry32) and `chance(rng, probability)`. Seeded by `?seed=` so autoloop screenshots are reproducible.
 - **voxel.ts** (`src/lib/voxel.ts`): Voxel geometry helpers — `VoxelPart`, `mergeVoxelParts(parts)` (bakes per-part colors into one vertex-colored `BufferGeometry`), `box(w,h,d)`, and `voxelMaterial()` (shared `vertexColors` + `flatShading` material). Used by the Portfolio `Props` and `Pedestals` components.
-- **theme.ts** (`src/lib/theme.ts`): Mock theme object `GAME_THEME` (arena/snake/food/ui tokens). To be refined later.
-- **assets/fonts** (`src/lib/assets/fonts/`): Shared `helvetiker_bold.typeface.json` (drei `Text3D` billboard text on pedestals; `FontLoader`/`TextGeometry` glyph cache for Letter Rain).
+- **theme.ts** (`src/lib/theme.ts`): Mock theme object `GAME_THEME` (arena/ui/town tokens). To be refined later.
+- **assets/fonts** (`src/lib/assets/fonts/`): Shared `helvetiker_bold.typeface.json` (drei `Text3D` billboard text on pedestals).
 
 ## State Management (Stores) (`src/stores`)
 
-- **snake3d** (`src/stores/snake3d`): Effector store for the game UI state.
-  - `snake3d.ts`: `$snake3d` store — phase, gameId (increments on every `startGame`, used to trigger world reset), score, hp, best (persisted in localStorage).
-  - `events.ts`: `startGame`, `gameOver`, `toMenu`, `pauseGame`, `resumeGame`, `addScore`, `damageSnake`.
-  - `types.ts`: `ISnake3DStore` interface.
-- **letters** (`src/stores/letters`): Effector events feeding the Letter Rain world (which lives in a page ref).
-  - `events.ts`: `letterTyped(char)`, `clearLetters`.
+- **expedition** (`src/stores/expedition`): see "Expedition store" above.
 
 ## Page-Specific Libs
 
@@ -49,7 +38,7 @@
   - `biomes.ts`: `BiomeId` + `BIOMES` (meadow / forest / rocky / mountain) with bright cartoon palettes and per-chunk spawn densities.
   - `terrain.ts`: `createTerrain(seed)` → `heightAt` (fbm hills + massif mountains, quantized to 0.25 for voxel steps, flat starting pad near spawn), `biomeAt`, `normalAt`.
   - `generate.ts` (`src/pages/Portfolio/lib/world/generate.ts`): Seeded biome-weighted vegetation with spacing between solid props, chunk-edge margins and spawn/pedestal clearings. A separate RNG generates 3–5-crate supply piles on reasonably flat areas in 48% of chunks, plus the nine-crate starting stack. Crates are dynamic and excluded from static colliders.
-  - `pedestals.ts` (`src/pages/Portfolio/lib/world/pedestals.ts`): Portal focus height is 3.9 to match the redesigned plaque. `createStartPedestals()` guarantees Snake 3D and Letter Rain in the initial area; `createPedestalForChunk(seed, cx, cz)` applies `PEDESTAL_CHANCE` (1%) independently to every streamed chunk; `createPedestals(seed)` is the initial-window helper.
+  - `pedestals.ts` (`src/pages/Portfolio/lib/world/pedestals.ts`): Portal focus height is 3.9 to match the redesigned plaque. `createStartPedestals()` guarantees Snake 3D and Letter Rain altars (external links to the portfolio site) in the initial area; `createPedestalForChunk(seed, cx, cz)` applies `PEDESTAL_CHANCE` (1%) independently to every streamed chunk; `createPedestals(seed)` is the initial-window helper.
   - `index.ts`: Streaming world manager. Keeps a deterministic `chunkCache`, maintains an active 8×6 window around the player's current chunk, rebuilds active props/pedestals/colliders on window shifts, and exposes `updateWorldStreaming`, `subscribeWorld`, `getWorldRevision`, `world`, `terrain`, and `groundHeight`.
   - `types.ts` (`src/pages/Portfolio/lib/world/types.ts`): `Prop` (including dynamic crate spawn definitions), `Chunk`, `Collider`, `PedestalDef`, `World`.
   - `index.ts`: builds the singleton `world` (seed, terrain, chunks, props, pedestals, colliders) and exports `groundHeight(x, z)` and `terrain`.
@@ -59,24 +48,16 @@
   - `physics.ts`: `resolveObstacles(pos, radius)` (circle-vs-cylinder push-out over the currently active `world.colliders`, returns whether a hit occurred so the car can damp its speed). Player movement has no artificial world-boundary clamp; streaming moves the active window as the player travels.
   - `interaction.ts`: `tryStartInteraction(state)` (find nearest pedestal within `INTERACTION_RADIUS` and arm the activation) and `stepInteraction(state, dt, onNavigate)` (advance `interactionTimer`, navigate when it reaches `ANIMATION_DURATION`, return whether an interaction is in progress so movement is skipped).
 
-- **Letter Rain world/lib** (`src/pages/Letters/lib`): Used only by the Letters page.
-  - `constants.ts`: Layout/physics tuning — `MAX_LETTERS` (9), `MIN_LETTER_PX` (120 — minimum on-screen letter size in px), play-area bounds (`AREA_HALF_W`, `AREA_HEIGHT`; `AREA_HALF_D` = 0.9 ≈ 1.5 × letter depth — the field is one row deep), fast fall tuning (`GRAVITY` 90, `INITIAL_VY` -10, `MAX_FALL_SPEED` 60), free tilt dynamics (`MAX_TILT` 0.3 rad with limit bounce, `TILT_VELOCITY` 2, `TILT_AIR_DRAG`, `TILT_REST_DRAG`, `TILT_IMPACT_KICK`), camera FOV/margin, visual tokens (background/letter/floor/wall colors).
-  - `types.ts`: `LetterEntity` (id, char, position/velocity vectors, tilt + tilt velocities, per-char base AABB half-extents, resting flag), `LettersWorld` (letters array, nextId, `pxPerWorld`, `letterScale`).
-  - `geometry.ts`: Font + glyph geometry cache — parses the shared `helvetiker_bold.typeface.json` once (`FontLoader`), builds a centered `TextGeometry` per unique character (cached), and exposes each char's bounding box (clamped to a 0.05 min) for collision.
-  - `world.ts`: `createLettersWorld()`, `spawnLetter(world, char)` (pushes ONE letter above the top boundary at z = 0, evicts the oldest past `MAX_LETTERS`), `clearWorldLetters(world)`, `getLetterScale(world, letter)` (uniform scale so both glyph dimensions reach `world.letterScale`, which the camera rig derives from `MIN_LETTER_PX`).
-  - `physics.ts`: Hand-rolled AABB simulation — `stepLetters(world, dt)`: gravity + integration, side/bottom wall clamps (no top clamp), single-row depth (every letter is locked at z = 0 — no depth stacking), pairwise overlap resolution in X/Y only (vertical case zeroes both y-velocities so landing letters stop), a final clamp pass so no letter can ever end a frame below the floor, support detection + resting state, tilt damping on contact. **Tilt is free/dynamic**: integrated every frame via `stepTilt` (air drag while falling, gentler friction at rest), bounces off the ±`MAX_TILT` limits instead of being forced flat, and hard landings / pile impacts add random angular kicks (`TILT_IMPACT_KICK`) so letters keep their landed angle and rock on impact — ready for drag & drop later. Allocation-free hot path (mutates entities in place).
-  - `physics.test.ts`: Vitest suite — gravity, floor settling, no top clamp, side clamps, single-row depth lock, letter-letter separation, spawn above top, cap eviction, no sinking below the floor while stacking, **landed tilt is preserved (not reset to flat)**, scale guarantees both dimensions ≥ `letterScale`.
 
 ## Entry Point
 
-- **main.tsx** (`src/main.tsx`): Bootstraps the app — `ThemeProvider` with `GAME_THEME`, `GlobalStyle`, `BrowserRouter` (`basename="/portfolio"`) and route-level `React.lazy` code-split pages behind a `Suspense` boundary.
+- **main.tsx** (`src/main.tsx`): Bootstraps the app — `ThemeProvider` with `GAME_THEME`, `GlobalStyle`, `BrowserRouter` (`basename="/valley-riding"`) and route-level `React.lazy` code-split pages behind a `Suspense` boundary.
 
 ## Tests
 
 - **Vitest** (`vitest.config.ts`): Unit tests for pure game logic run with `npm test` (`vitest run`).
-  - `src/lib/utils.test.ts` — vector/angle helpers.
-  - `src/lib/physics.test.ts` — `stepWorld`, `segmentRadius`, `isGameOver`, wall damage, boost ram / shell break tracking, boost cooldown and 0% hard stop.
-  - `src/stores/snake3d/snake3d.test.ts` — store reducers and best-score persistence (localStorage stub).
+  - `src/lib/random.test.ts`, `src/lib/expedition.test.ts` — shared helpers and expedition rules.
+  - `src/pages/Portfolio/lib/**/*.test.ts` — car, crate, ramp and world generation.
 
 ## Autoloop Tooling (`scripts/autoloop`)
 

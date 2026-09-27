@@ -14,7 +14,7 @@ verified by a vision-model judge on fixed-seed screenshots.
 
 - Infinite procedural voxel terrain with chunk streaming and explicit biomes.
 - Removal of the perimeter fence (`lib/Walls.tsx`) in favor of an open world.
-- Random pedestals (existing mini-games `Snake 3D`, `Letter Rain`) placed by a
+- Random pedestals (links to the portfolio mini-games `Snake 3D`, `Letter Rain`) placed by a
   seeded RNG.
 
 ## Element inventory

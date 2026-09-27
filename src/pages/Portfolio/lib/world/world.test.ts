@@ -121,7 +121,10 @@ describe("pedestals", () => {
     const pedestals = createPedestals(SEED);
     const targets = pedestals.slice(0, 2).map((pedestal) => pedestal.target);
 
-    expect(targets).toEqual(["/snake", "/letters"]);
+    expect(targets).toEqual([
+      "https://fazeich.github.io/portfolio/snake",
+      "https://fazeich.github.io/portfolio/letters",
+    ]);
 
     for (const pedestal of pedestals.slice(0, 2)) {
       expect(Number.isFinite(pedestal.position.x)).toBe(true);

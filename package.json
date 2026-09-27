@@ -1,8 +1,8 @@
 {
-  "name": "vite-portfolio",
-  "homepage": "https://fazeich.github.io/portfolio",
+  "name": "valley-riding",
+  "homepage": "https://fazeich.github.io/valley-riding",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "start": "vite --config configs/vite.config.ts",
@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "preview": "vite preview",
-    "predeploy": "npm run build && copy dist\\index.html dist\\404.html",
+    "predeploy": "npm run build && node -e \"require('fs').copyFileSync('dist/index.html','dist/404.html')\"",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {

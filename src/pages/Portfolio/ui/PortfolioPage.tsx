@@ -74,6 +74,10 @@ export const PortfolioPage = () => {
 
 const handleNavigate = useCallback(
     (path: string) => {
+      if (/^https?:\/\//.test(path)) {
+        window.location.assign(path);
+        return;
+      }
       navigate(path);
     },
     [navigate],

@@ -3,6 +3,9 @@ import { expeditionClearing } from "@/lib/expedition";
 import { CHUNK_SIZE } from "../constants";
 import { PedestalDef } from "./types";
 
+// Mini-games live in the portfolio app; the altars link out to them.
+const MINI_GAMES_HOST = "https://fazeich.github.io/portfolio";
+
 export const PEDESTAL_CHANCE = 0.01;
 
 interface MiniGame {
@@ -12,8 +15,8 @@ interface MiniGame {
 }
 
 const MINI_GAMES: MiniGame[] = [
-  { target: "/snake", label: "Snake 3D", accent: "#22c55e" },
-  { target: "/letters", label: "Letter Rain", accent: "#f59e0b" },
+  { target: `${MINI_GAMES_HOST}/snake`, label: "Snake 3D", accent: "#22c55e" },
+  { target: `${MINI_GAMES_HOST}/letters`, label: "Letter Rain", accent: "#f59e0b" },
 ];
 
 const START_PEDESTALS: Array<{ x: number; z: number; game: MiniGame }> = [

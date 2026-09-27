@@ -84,7 +84,7 @@ const Pedestal = ({
         <meshBasicMaterial color={pedestal.accent} />
       </mesh>
       <group ref={emblemRef} position={[0, 2, 0]}>
-        {pedestal.target === "/snake" ? (
+        {pedestal.target.endsWith("/snake") ? (
           <mesh geometry={snakeGeometry} material={stoneMaterial} dispose={null} castShadow />
         ) : (
           <Center>

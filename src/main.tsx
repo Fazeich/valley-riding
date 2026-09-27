@@ -11,25 +11,15 @@ const PortfolioPage = lazy(() =>
     default: PortfolioPage,
   })),
 );
-const SnakePage = lazy(() =>
-  import("@/pages/Snake").then(({ SnakePage }) => ({ default: SnakePage })),
-);
-const LettersPage = lazy(() =>
-  import("@/pages/Letters").then(({ LettersPage }) => ({
-    default: LettersPage,
-  })),
-);
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <ThemeProvider theme={GAME_THEME}>
       <GlobalStyle />
-      <BrowserRouter basename="/portfolio">
+      <BrowserRouter basename="/valley-riding">
         <Suspense fallback={null}>
           <Routes>
-            <Route path="/" element={<PortfolioPage />} />
-            <Route path="/snake" element={<SnakePage />} />
-            <Route path="/letters" element={<LettersPage />} />
+            <Route path="*" element={<PortfolioPage />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

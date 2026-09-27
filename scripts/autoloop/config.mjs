@@ -52,7 +52,7 @@ export const gates = [
 
 export const preview = {
   port: 4173,
-  urlPath: "/portfolio/",
+  urlPath: "/valley-riding/",
 };
 
 export const captures = [
@@ -64,6 +64,4 @@ export const captures = [
     freeze: true,
     player: { x: 10, z: -9, facing: Math.PI },
   },
-  { id: "snake", route: "snake", settleMs: 2500, freeze: false },
-  { id: "letters", route: "letters", settleMs: 1800, freeze: false },
 ];
